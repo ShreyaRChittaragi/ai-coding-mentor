@@ -5,6 +5,7 @@ class Settings(BaseSettings):
     DEBUG: bool = True
     GROQ_API_KEY: str = ""
     HINDSIGHT_API_KEY: str = ""
+    HINDSIGHT_URL: str = "https://ui.hindsight.vectorize.io"
 
     class Config:
         env_file = ".env"

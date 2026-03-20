@@ -1,30 +1,39 @@
-from app.memory.schemas import UserMemoryProfile, PatternRecord
-from datetime import datetime
+from hindsight_client import Hindsight
+from app.core.config import settings
 
-_memory_store: dict[str, UserMemoryProfile] = {}
+client = Hindsight(
+    api_key=settings.HINDSIGHT_API_KEY,
+    base_url=settings.HINDSIGHT_URL
+)
+
+BANK_ID = "coding-mentor"
 
 def store_session(user_id: str, session_data: dict):
-    if user_id not in _memory_store:
-        _memory_store[user_id] = UserMemoryProfile(user_id=user_id)
-
-    profile = _memory_store[user_id]
-    profile.total_sessions += 1
-    profile.last_active = datetime.now()
-
-    for p in session_data.get("patterns", []):
-        profile.patterns.append(PatternRecord(
-            pattern=p,
-            confidence=0.75,        # placeholder until P4 sends confidence
-            mistake_type=None
-        ))
+    content = (
+        f"User {user_id} completed a session. "
+        f"Patterns: {session_data.get('patterns', [])}. "
+        f"Time: {session_data.get('time_taken_seconds')}s. "
+        f"Attempts: {session_data.get('attempts')}. "
+        f"Solved: {session_data.get('solved')}."
+    )
+    client.retain(
+        bank_id=BANK_ID,
+        text=content,
+        metadata={"user_id": user_id}
+    )
 
 def retrieve_memory(user_id: str) -> dict:
-    profile = _memory_store.get(user_id)
-    if not profile:
-        return {"user_id": user_id, "message": "No memory found"}
-    return profile.model_dump()
+    results = client.recall(
+        bank_id=BANK_ID,
+        query=f"behavioral patterns of user {user_id}",
+        filters={"user_id": user_id}
+    )
+    return {"user_id": user_id, "memory": results}
 
-def update_memory(user_id: str, new_pattern: PatternRecord):
-    if user_id not in _memory_store:
-        _memory_store[user_id] = UserMemoryProfile(user_id=user_id)
-    _memory_store[user_id].patterns.append(new_pattern)
+def reflect_on_user(user_id: str, question: str) -> str:
+    response = client.reflect(
+        bank_id=BANK_ID,
+        query=question,
+        filters={"user_id": user_id}
+    )
+    return response
