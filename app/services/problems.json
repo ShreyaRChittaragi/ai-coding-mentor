@@ -1,0 +1,89 @@
+[
+  {
+    "id": "p001",
+    "title": "Two Sum",
+    "description": "Given a list of integers and a target, return the indices of the two numbers that add up to the target.",
+    "difficulty": "easy",
+    "topic": "arrays",
+    "examples": [
+      {"input": "[2,7,11,15], target=9", "output": "[0,1]"}
+    ],
+    "test_cases": [
+      {"input": {"nums": [2, 7, 11, 15], "target": 9},  "expected": [0, 1]},
+      {"input": {"nums": [3, 2, 4],      "target": 6},  "expected": [1, 2]},
+      {"input": {"nums": [3, 3],         "target": 6},  "expected": [0, 1]}
+    ],
+    "function_name": "two_sum",
+    "starter_code": "def two_sum(nums, target):\n    pass"
+  },
+  {
+    "id": "p002",
+    "title": "Reverse a String",
+    "description": "Write a function that takes a string and returns it reversed.",
+    "difficulty": "easy",
+    "topic": "strings",
+    "examples": [
+      {"input": "\"hello\"", "output": "\"olleh\""}
+    ],
+    "test_cases": [
+      {"input": {"s": "hello"},   "expected": "olleh"},
+      {"input": {"s": "world"},   "expected": "dlrow"},
+      {"input": {"s": ""},        "expected": ""},
+      {"input": {"s": "a"},       "expected": "a"}
+    ],
+    "function_name": "reverse_string",
+    "starter_code": "def reverse_string(s):\n    pass"
+  },
+  {
+    "id": "p003",
+    "title": "FizzBuzz",
+    "description": "Return a list where multiples of 3 are 'Fizz', multiples of 5 are 'Buzz', both are 'FizzBuzz', else the number as string.",
+    "difficulty": "easy",
+    "topic": "loops",
+    "examples": [
+      {"input": "n=5", "output": "[\"1\",\"2\",\"Fizz\",\"4\",\"Buzz\"]"}
+    ],
+    "test_cases": [
+      {"input": {"n": 5},  "expected": ["1","2","Fizz","4","Buzz"]},
+      {"input": {"n": 15}, "expected": ["1","2","Fizz","4","Buzz","Fizz","7","8","Fizz","Buzz","11","Fizz","13","14","FizzBuzz"]},
+      {"input": {"n": 1},  "expected": ["1"]}
+    ],
+    "function_name": "fizz_buzz",
+    "starter_code": "def fizz_buzz(n):\n    pass"
+  },
+  {
+    "id": "p004",
+    "title": "Valid Palindrome",
+    "description": "Check if a string is a palindrome, ignoring spaces and case.",
+    "difficulty": "medium",
+    "topic": "strings",
+    "examples": [
+      {"input": "\"racecar\"", "output": "true"}
+    ],
+    "test_cases": [
+      {"input": {"s": "racecar"},    "expected": true},
+      {"input": {"s": "hello"},      "expected": false},
+      {"input": {"s": "A man a plan a canal Panama"}, "expected": true},
+      {"input": {"s": ""},           "expected": true}
+    ],
+    "function_name": "is_palindrome",
+    "starter_code": "def is_palindrome(s):\n    pass"
+  },
+  {
+    "id": "p005",
+    "title": "Find Maximum",
+    "description": "Given a list of integers, return the maximum value without using Python's built-in max().",
+    "difficulty": "easy",
+    "topic": "arrays",
+    "examples": [
+      {"input": "[3,1,4,1,5,9]", "output": "9"}
+    ],
+    "test_cases": [
+      {"input": {"nums": [3,1,4,1,5,9]},  "expected": 9},
+      {"input": {"nums": [-1,-5,-2]},      "expected": -1},
+      {"input": {"nums": [42]},            "expected": 42}
+    ],
+    "function_name": "find_max",
+    "starter_code": "def find_max(nums):\n    pass"
+  }
+]
