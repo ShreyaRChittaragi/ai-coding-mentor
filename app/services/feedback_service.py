@@ -1,28 +1,38 @@
 """
 feedback_service.py — Person 3 (LLM & Feedback Service)
-Main orchestrator. Combines PromptBuilder + GroqClient to generate
-adaptive hints, encouragement, and success feedback.
-Place: app/services/feedback_service.py
+Updated to use real P1 + P2 data formats.
 """
 
 from app.services.groq_client import GroqClient
 from app.services.prompt_builder import PromptBuilder
 
 
-# ── Dummy data for development (swap when P2 + P1 PRs merge) ──────────────────
+# ── Real dummy data matching P1 + P2 actual formats ───────────────────────────
 
 DUMMY_EVAL_RESULT = {
     "passed": False,
-    "error": "IndexError: list index out of range",
-    "error_type": "IndexError",
-    "attempts": 3,
-    "failed_cases": ["Input: [], Expected: 0", "Input: [1], Expected: 1"],
+    "score": 1,
+    "total": 3,
+    "errors": ["IndexError: list index out of range"],
+    "edge_case_results": [
+        {"case_index": 0, "input": {}, "expected": 0, "actual": None, "passed": False},
+        {"case_index": 1, "input": {"nums": [1]}, "expected": 1, "actual": None, "passed": False},
+    ],
+    "execution_time_ms": 42,
 }
 
 DUMMY_USER_PROFILE = {
-    "pattern": "overthinking",
-    "confidence": 0.78,
-    "mistake_type": "edge_case",
+    "user_id": "user_001",
+    "total_sessions": 5,
+    "patterns": [
+        {
+            "pattern": "overthinking",
+            "confidence": 0.78,
+            "mistake_type": "edge_case",
+        }
+    ],
+    "last_active": None,
+    "notes": None,
 }
 
 DUMMY_PROBLEM = {
@@ -44,6 +54,51 @@ def two_sum(nums, target):
 ENCOURAGEMENT_THRESHOLD = 3
 
 
+# ── Helpers to extract from real formats ─────────────────────────────────────
+
+def extract_pattern_info(user_profile: dict) -> dict:
+    """
+    Extract pattern, confidence, mistake_type from P1's UserMemoryProfile.
+    Gets the most recent pattern from the patterns list.
+    """
+    patterns = user_profile.get("patterns", [])
+    if patterns:
+        latest = patterns[-1]  # most recent pattern
+        return {
+            "pattern": latest.get("pattern", "unknown"),
+            "confidence": latest.get("confidence", 0.0),
+            "mistake_type": latest.get("mistake_type", None),
+        }
+    return {
+        "pattern": "unknown",
+        "confidence": 0.0,
+        "mistake_type": None,
+    }
+
+
+def extract_eval_info(eval_result: dict) -> dict:
+    """
+    Extract clean info from P2's EvalResult for use in prompts.
+    """
+    errors = eval_result.get("errors", [])
+    edge_cases = eval_result.get("edge_case_results", [])
+
+    # Get failed cases as readable strings
+    failed_cases = [
+        f"Input: {r['input']}, Expected: {r['expected']}, Got: {r['actual']}"
+        for r in edge_cases if not r.get("passed", True)
+    ]
+
+    return {
+        "passed": eval_result.get("passed", False),
+        "error": errors[0] if errors else None,
+        "error_type": errors[0].split(":")[0] if errors else None,
+        "attempts": eval_result.get("score", 0),
+        "failed_cases": failed_cases,
+        "execution_time_ms": eval_result.get("execution_time_ms", 0),
+    }
+
+
 # ── Main Service ──────────────────────────────────────────────────────────────
 
 class FeedbackService:
@@ -58,9 +113,19 @@ class FeedbackService:
         eval_result: dict,
         user_profile: dict,
     ) -> dict:
-        passed = eval_result.get("passed", False)
-        attempts = eval_result.get("attempts", 1)
-        pattern = user_profile.get("pattern", "unknown")
+        """
+        Full feedback response for a submission.
+
+        eval_result → from P2's execution_service.py
+        user_profile → from P1's UserMemoryProfile
+        """
+        # ── Extract clean data from real formats
+        clean_eval = extract_eval_info(eval_result)
+        clean_profile = extract_pattern_info(user_profile)
+
+        passed = clean_eval["passed"]
+        attempts = eval_result.get("total", 1)
+        pattern = clean_profile["pattern"]
 
         result = {
             "hint": None,
@@ -82,8 +147,8 @@ class FeedbackService:
                 problem_title=problem.get("title", "this problem"),
                 problem_description=problem.get("description", ""),
                 user_code=user_code,
-                eval_result=eval_result,
-                user_profile=user_profile,
+                eval_result=clean_eval,
+                user_profile=clean_profile,
             )
             result["hint"] = self.client.chat(sys_p, usr_p)
 
@@ -98,12 +163,14 @@ class FeedbackService:
         return result
 
     def get_hint_only(self, problem, user_code, eval_result, user_profile) -> str:
+        clean_eval = extract_eval_info(eval_result)
+        clean_profile = extract_pattern_info(user_profile)
         sys_p, usr_p = self.builder.build_hint_prompt(
             problem_title=problem.get("title", ""),
             problem_description=problem.get("description", ""),
             user_code=user_code,
-            eval_result=eval_result,
-            user_profile=user_profile,
+            eval_result=clean_eval,
+            user_profile=clean_profile,
         )
         return self.client.chat(sys_p, usr_p)
 
@@ -117,14 +184,12 @@ class FeedbackService:
 
 
 # ── Quick local test ──────────────────────────────────────────────────────────
-# Run: python -m app.services.feedback_service
-
 if __name__ == "__main__":
     import json
     from dotenv import load_dotenv
     load_dotenv()
 
-    print("🔧 Running FeedbackService with dummy data...\n")
+    print("🔧 Running FeedbackService with real format dummy data...\n")
     service = FeedbackService()
     feedback = service.get_feedback(
         problem=DUMMY_PROBLEM,
