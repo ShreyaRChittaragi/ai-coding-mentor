@@ -23,6 +23,8 @@ class EvalResult(BaseModel):
     total: int
     all_passed: bool
     error_types: List[str]
+    edge_case_results: List[dict]
+    execution_time_ms: int
 
 class FeedbackOut(BaseModel):
     user_id: str
