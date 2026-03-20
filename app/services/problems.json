@@ -85,5 +85,79 @@
     ],
     "function_name": "find_max",
     "starter_code": "def find_max(nums):\n    pass"
+  },
+  {
+    "id": "p006",
+    "title": "Fibonacci Sequence",
+    "description": "Return the nth Fibonacci number. F(0)=0, F(1)=1, F(n)=F(n-1)+F(n-2). Do not use recursion.",
+    "difficulty": "medium",
+    "topic": "dynamic_programming",
+    "examples": [
+      {"input": "n=6", "output": "8"}
+    ],
+    "test_cases": [
+      {"input": {"n": 0},  "expected": 0},
+      {"input": {"n": 1},  "expected": 1},
+      {"input": {"n": 6},  "expected": 8},
+      {"input": {"n": 10}, "expected": 55}
+    ],
+    "function_name": "fibonacci",
+    "starter_code": "def fibonacci(n):\n    pass"
+  },
+  {
+    "id": "p007",
+    "title": "Count Vowels",
+    "description": "Given a string, return the count of vowels (a, e, i, o, u). Case insensitive.",
+    "difficulty": "easy",
+    "topic": "strings",
+    "examples": [
+      {"input": "\"hello world\"", "output": "3"}
+    ],
+    "test_cases": [
+      {"input": {"s": "hello world"},  "expected": 3},
+      {"input": {"s": "AEIOU"},        "expected": 5},
+      {"input": {"s": "rhythm"},       "expected": 0},
+      {"input": {"s": ""},             "expected": 0},
+      {"input": {"s": "Beautiful"},    "expected": 5}
+    ],
+    "function_name": "count_vowels",
+    "starter_code": "def count_vowels(s):\n    pass"
+  },
+  {
+    "id": "p008",
+    "title": "Find Duplicates",
+    "description": "Given a list of integers, return a list of all numbers that appear more than once. Return them in the order they first appeared. No built-in set tricks allowed — use a loop.",
+    "difficulty": "medium",
+    "topic": "arrays",
+    "examples": [
+      {"input": "[1,2,3,2,4,3]", "output": "[2,3]"}
+    ],
+    "test_cases": [
+      {"input": {"nums": [1,2,3,2,4,3]},    "expected": [2,3]},
+      {"input": {"nums": [1,2,3]},           "expected": []},
+      {"input": {"nums": [5,5,5]},           "expected": [5]},
+      {"input": {"nums": [4,3,2,1,4,3,2,1]},"expected": [4,3,2,1]}
+    ],
+    "function_name": "find_duplicates",
+    "starter_code": "def find_duplicates(nums):\n    pass"
+  },
+  {
+    "id": "p009",
+    "title": "Balanced Parentheses",
+    "description": "Given a string containing only '(', ')', '{', '}', '[', ']', return True if the brackets are balanced.",
+    "difficulty": "medium",
+    "topic": "stacks",
+    "examples": [
+      {"input": "\"({[]})\"", "output": "true"}
+    ],
+    "test_cases": [
+      {"input": {"s": "()"},      "expected": true},
+      {"input": {"s": "({[]})"},  "expected": true},
+      {"input": {"s": "(]"},      "expected": false},
+      {"input": {"s": "((()"},    "expected": false},
+      {"input": {"s": ""},        "expected": true}
+    ],
+    "function_name": "is_balanced",
+    "starter_code": "def is_balanced(s):\n    pass"
   }
 ]
