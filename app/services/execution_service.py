@@ -78,22 +78,20 @@ def run_user_code(user_code: str, function_name: str, test_cases: list[dict]) ->
     exec_time_ms = int((time.monotonic() - start_time) * 1000)
 
     return {
-        "passed": passed_count == total,
-        "score": passed_count,
+        "passed_count": passed_count,        # was "score"
         "total": total,
-        "errors": errors,
+        "all_passed": passed_count == total, # was "passed"
+        "error_types": errors,               # was "errors"
         "edge_case_results": edge_case_results,
         "execution_time_ms": exec_time_ms
     }
 
-
-
 def _error_result(message: str, total: int, start_time: float) -> dict:
     return {
-        "passed": False,
-        "score": 0,
+        "passed_count": 0,
         "total": total,
-        "errors": [message],
+        "all_passed": False,
+        "error_types": [message],
         "edge_case_results": [],
         "execution_time_ms": int((time.monotonic() - start_time) * 1000)
     }
