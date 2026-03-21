@@ -6,6 +6,7 @@ export default function ProblemPanel({ problemId, apiBase, onProblemChange, user
   const [nextLoading, setNextLoading] = useState(false);
   const [error, setError] = useState(null);
   const [inputId, setInputId] = useState(problemId);
+  const [nextReason, setNextReason] = useState(null);
 
   const loadProblem = async (id) => {
     setLoading(true);
@@ -27,12 +28,14 @@ export default function ProblemPanel({ problemId, apiBase, onProblemChange, user
 
   const loadNextProblem = async () => {
     setNextLoading(true);
+    setNextReason(null);
     setError(null);
     try {
       const res = await fetch(`${apiBase}/next_problem/${userId}`);
       if (!res.ok) throw new Error("Could not fetch next problem");
       const data = await res.json();
-      const nextId = data.problem_id || data.id || data;
+      const nextId = data.next_problem?.id || data.problem_id || data.id;
+      if (data.reason) setNextReason(data.reason);
       await loadProblem(nextId);
     } catch (err) {
       setError(err.message);
@@ -70,23 +73,35 @@ export default function ProblemPanel({ problemId, apiBase, onProblemChange, user
       {problem && !loading && (
         <>
           <div className="problem-title">{problem.title}</div>
-          {problem.difficulty && (
-            <span className={`difficulty-badge ${difficultyClass}`}>
-              {problem.difficulty}
-            </span>
-          )}
+          <div className="problem-meta">
+            {problem.difficulty && (
+              <span className={`difficulty-badge ${difficultyClass}`}>
+                {problem.difficulty}
+              </span>
+            )}
+            {problem.topic && (
+              <span className="topic-badge">{problem.topic}</span>
+            )}
+          </div>
           <div className="problem-description">{problem.description}</div>
         </>
+      )}
+
+      {nextReason && (
+        <div className="next-reason">
+          <span className="next-reason-label">Why this problem?</span>
+          {nextReason}
+        </div>
       )}
 
       <button
         className="next-btn"
         onClick={loadNextProblem}
         disabled={nextLoading}
-        style={{ marginTop: "16px" }}
+        style={{ marginTop: "12px" }}
       >
         {nextLoading ? (
-          <><span className="spinner" style={{ borderColor: "#0d0f14", borderTopColor: "transparent" }} /> Finding...</>
+          <><span className="spinner" style={{ borderColor: "#fff", borderTopColor: "transparent" }} /> Finding...</>
         ) : (
           <>⚡ Next Problem</>
         )}

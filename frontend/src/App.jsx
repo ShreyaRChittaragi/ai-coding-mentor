@@ -5,7 +5,7 @@ import FeedbackPanel from "./components/FeedbackPanel";
 import InsightsPanel from "./components/InsightsPanel";
 import "./App.css";
 
-const USER_ID = "user_001";
+const USER_ID = "test_user";
 const API_BASE = "http://127.0.0.1:8000";
 
 export default function App() {
@@ -14,6 +14,7 @@ export default function App() {
   const [feedback, setFeedback] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [submitCount, setSubmitCount] = useState(0);
 
   const handleSubmit = async () => {
     setLoading(true);
@@ -25,6 +26,7 @@ export default function App() {
       if (!res.ok) throw new Error(`Server error: ${res.status}`);
       const data = await res.json();
       setFeedback(data);
+      setSubmitCount(c => c + 1);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -40,6 +42,11 @@ export default function App() {
           <span className="app-title">AI Coding Mentor</span>
         </div>
         <div className="header-right">
+          {submitCount > 0 && (
+            <span className="submit-count-badge">
+              {submitCount} submit{submitCount !== 1 ? "s" : ""}
+            </span>
+          )}
           <span className="user-badge">👤 {USER_ID}</span>
         </div>
       </header>
@@ -53,6 +60,7 @@ export default function App() {
             onProblemChange={(id, starterCode) => {
               setProblemId(id);
               if (starterCode) setCode(starterCode);
+              setFeedback(null);
             }}
           />
           <InsightsPanel userId={USER_ID} apiBase={API_BASE} feedback={feedback} />
@@ -61,10 +69,20 @@ export default function App() {
         <section className="center-panel">
           <div className="editor-header">
             <span className="editor-label">EDITOR</span>
-            <span className="lang-badge">Python</span>
+            <div className="editor-header-right">
+              <span className="problem-id-chip">{problemId}</span>
+              <span className="lang-badge">Python</span>
+            </div>
           </div>
           <CodeEditor code={code} onChange={setCode} />
           <div className="editor-footer">
+            <div className="footer-left">
+              {feedback?.eval_result && (
+                <span className={`footer-status ${feedback.eval_result.all_passed ? "status-pass" : "status-fail"}`}>
+                  {feedback.eval_result.all_passed ? "✓" : "✗"} {feedback.eval_result.passed_count}/{feedback.eval_result.total} tests
+                </span>
+              )}
+            </div>
             <button className="submit-btn" onClick={handleSubmit} disabled={loading}>
               {loading ? (
                 <><span className="spinner" /> Running...</>

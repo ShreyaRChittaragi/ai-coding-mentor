@@ -13,7 +13,7 @@ export default function InsightsPanel({ userId, apiBase, feedback }) {
 
   const fetchProfile = async () => {
     try {
-      const res = await fetch(`${apiBase}/user_profile/${userId}`);
+      const res = await fetch(`${apiBase}/memory/recall/${userId}`);
       if (!res.ok) return;
       const data = await res.json();
       setProfile(data);
@@ -22,27 +22,42 @@ export default function InsightsPanel({ userId, apiBase, feedback }) {
 
   useEffect(() => { fetchProfile(); }, [userId]);
 
-  // Refresh after new feedback comes in
   useEffect(() => {
     if (feedback) fetchProfile();
   }, [feedback]);
 
-  const patterns = profile?.patterns ?? [];
+  const patterns = profile?.memory?.patterns ?? profile?.patterns ?? [];
+  const totalSessions = profile?.memory?.total_sessions ?? profile?.total_sessions ?? 0;
+
+  // Deduplicate patterns — show unique with highest confidence
+  const uniquePatterns = Object.values(
+    patterns.reduce((acc, p) => {
+      if (!acc[p.pattern] || p.confidence > acc[p.pattern].confidence) {
+        acc[p.pattern] = p;
+      }
+      return acc;
+    }, {})
+  ).sort((a, b) => b.confidence - a.confidence);
 
   return (
     <div className="panel-card">
-      <div className="panel-title">Insights</div>
+      <div className="insights-header">
+        <div className="panel-title" style={{ margin: 0 }}>Insights</div>
+        {totalSessions > 0 && (
+          <span className="session-count">{totalSessions} session{totalSessions !== 1 ? "s" : ""}</span>
+        )}
+      </div>
 
-      {patterns.length === 0 ? (
+      {uniquePatterns.length === 0 ? (
         <div className="no-insights">No patterns detected yet</div>
       ) : (
-        patterns.slice(-5).map((p, i) => {
+        uniquePatterns.map((p, i) => {
           const color = PATTERN_COLORS[p.pattern] || "#00e5a0";
           const confidence = Math.round((p.confidence ?? 0) * 100);
           return (
             <div key={i} className="pattern-item">
               <div className="pattern-header">
-                <span className="pattern-name">{p.pattern?.replace("_", " ")}</span>
+                <span className="pattern-name">{p.pattern?.replace(/_/g, " ")}</span>
                 <span className="pattern-score">{confidence}%</span>
               </div>
               <div className="pattern-bar">
@@ -58,7 +73,7 @@ export default function InsightsPanel({ userId, apiBase, feedback }) {
 
       {feedback?.pattern_detected && (
         <div className="pattern-detected">
-          ⚡ Latest: {feedback.pattern_detected.replace("_", " ")}
+          ⚡ Latest: {feedback.pattern_detected.replace(/_/g, " ")}
         </div>
       )}
     </div>

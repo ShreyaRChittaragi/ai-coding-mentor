@@ -81,6 +81,11 @@ export default function FeedbackPanel({ feedback, error, loading }) {
                     {tc.error && <div className="test-detail" style={{ color: "var(--error)" }}>{tc.error}</div>}
                   </>
                 )}
+                {tc.passed && (
+                  <div className="test-detail" style={{ color: "#4ade80", opacity: 0.7 }}>
+                    Input: {JSON.stringify(tc.input)}
+                  </div>
+                )}
               </div>
             ))}
           </>

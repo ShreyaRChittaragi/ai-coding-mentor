@@ -43,5 +43,6 @@ def get_feedback(user_id: str, problem_id: str, code: str):
         user_id=user_id,
         problem_id=problem_id,
         feedback=feedback.get("hint") or feedback.get("success_feedback") or "",
-        pattern_detected=pattern
+        pattern_detected=pattern,
+        eval_result=result_dict
     )

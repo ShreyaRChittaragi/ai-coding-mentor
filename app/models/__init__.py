@@ -31,6 +31,7 @@ class FeedbackOut(BaseModel):
     problem_id: str
     feedback: str
     pattern_detected: Optional[str] = None
+    eval_result: Optional[dict] = None
 
 class UserProfile(BaseModel):
     user_id: str
