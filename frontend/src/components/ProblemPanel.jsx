@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 
-export default function ProblemPanel({ problemId, apiBase, onProblemChange, onCodeChange }) {
+export default function ProblemPanel({ problemId, apiBase, onProblemChange, userId }) {
   const [problem, setProblem] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [nextLoading, setNextLoading] = useState(false);
   const [error, setError] = useState(null);
   const [inputId, setInputId] = useState(problemId);
 
@@ -14,11 +15,8 @@ export default function ProblemPanel({ problemId, apiBase, onProblemChange, onCo
       if (!res.ok) throw new Error("Problem not found");
       const data = await res.json();
       setProblem(data);
-      onProblemChange(id);
-      // Pre-fill editor with starter code
-      if (data.starter_code && onCodeChange) {
-        onCodeChange(data.starter_code);
-      }
+      setInputId(id);
+      onProblemChange(id, data.starter_code);
     } catch (err) {
       setError(err.message);
       setProblem(null);
@@ -27,18 +25,31 @@ export default function ProblemPanel({ problemId, apiBase, onProblemChange, onCo
     }
   };
 
+  const loadNextProblem = async () => {
+    setNextLoading(true);
+    setError(null);
+    try {
+      const res = await fetch(`${apiBase}/next_problem/${userId}`);
+      if (!res.ok) throw new Error("Could not fetch next problem");
+      const data = await res.json();
+      const nextId = data.problem_id || data.id || data;
+      await loadProblem(nextId);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setNextLoading(false);
+    }
+  };
+
   useEffect(() => { loadProblem(problemId); }, []);
 
-  const diffClass = problem?.difficulty
+  const difficultyClass = problem?.difficulty
     ? `difficulty-${problem.difficulty.toLowerCase()}`
     : "difficulty-easy";
 
   return (
-    <div className="panel-section" style={{ flex: 1, overflowY: "auto" }}>
-      <div className="panel-label">
-        <span className="panel-label-dot" />
-        Problem
-      </div>
+    <div className="panel-card" style={{ flex: 1 }}>
+      <div className="panel-title">Problem</div>
 
       <div className="problem-selector">
         <input
@@ -46,54 +57,40 @@ export default function ProblemPanel({ problemId, apiBase, onProblemChange, onCo
           value={inputId}
           onChange={(e) => setInputId(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && loadProblem(inputId)}
-          placeholder="e.g. p001"
+          placeholder="problem_id"
         />
         <button className="load-btn" onClick={() => loadProblem(inputId)}>
           Load
         </button>
       </div>
 
-      {loading && (
-        <div className="problem-loading">
-          <span className="spinner" style={{ borderColor: "var(--text-dim)", borderTopColor: "transparent" }} />
-          Loading...
-        </div>
-      )}
-
+      {loading && <div className="problem-loading">Loading...</div>}
       {error && <div className="problem-error">⚠ {error}</div>}
 
       {problem && !loading && (
         <>
           <div className="problem-title">{problem.title}</div>
           {problem.difficulty && (
-            <span className={`difficulty-badge ${diffClass}`}>
+            <span className={`difficulty-badge ${difficultyClass}`}>
               {problem.difficulty}
             </span>
           )}
           <div className="problem-description">{problem.description}</div>
-
-          {problem.examples?.length > 0 && (
-            <div style={{ marginTop: 14 }}>
-              <div className="section-label" style={{ marginBottom: 6 }}>Example</div>
-              {problem.examples.slice(0, 1).map((ex, i) => (
-                <div key={i} style={{
-                  background: "var(--bg4)",
-                  border: "1px solid var(--border)",
-                  borderRadius: "var(--radius-sm)",
-                  padding: "8px 10px",
-                  fontFamily: "var(--font-mono)",
-                  fontSize: 10.5,
-                  color: "var(--text-mid)",
-                  lineHeight: 1.7
-                }}>
-                  <div><span style={{ color: "var(--text-dim)" }}>Input: </span>{ex.input}</div>
-                  <div><span style={{ color: "var(--text-dim)" }}>Output: </span>{ex.output}</div>
-                </div>
-              ))}
-            </div>
-          )}
         </>
       )}
+
+      <button
+        className="next-btn"
+        onClick={loadNextProblem}
+        disabled={nextLoading}
+        style={{ marginTop: "16px" }}
+      >
+        {nextLoading ? (
+          <><span className="spinner" style={{ borderColor: "#0d0f14", borderTopColor: "transparent" }} /> Finding...</>
+        ) : (
+          <>⚡ Next Problem</>
+        )}
+      </button>
     </div>
   );
 }

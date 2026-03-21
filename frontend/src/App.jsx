@@ -14,7 +14,6 @@ export default function App() {
   const [feedback, setFeedback] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [submitCount, setSubmitCount] = useState(0);
 
   const handleSubmit = async () => {
     setLoading(true);
@@ -26,7 +25,6 @@ export default function App() {
       if (!res.ok) throw new Error(`Server error: ${res.status}`);
       const data = await res.json();
       setFeedback(data);
-      setSubmitCount(c => c + 1);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -39,7 +37,6 @@ export default function App() {
       <header className="app-header">
         <div className="header-left">
           <span className="logo">⟨/⟩</span>
-          <div className="header-divider" />
           <span className="app-title">AI Coding Mentor</span>
         </div>
         <div className="header-right">
@@ -52,32 +49,27 @@ export default function App() {
           <ProblemPanel
             problemId={problemId}
             apiBase={API_BASE}
-            onProblemChange={setProblemId}
-            onCodeChange={setCode}
+            userId={USER_ID}
+            onProblemChange={(id, starterCode) => {
+              setProblemId(id);
+              if (starterCode) setCode(starterCode);
+            }}
           />
           <InsightsPanel userId={USER_ID} apiBase={API_BASE} feedback={feedback} />
         </aside>
 
         <section className="center-panel">
           <div className="editor-header">
-            <div className="editor-tabs">
-              <span className="editor-tab">solution.py</span>
-            </div>
-            <div className="editor-actions">
-              <span className="lang-badge">Python 3</span>
-            </div>
+            <span className="editor-label">EDITOR</span>
+            <span className="lang-badge">Python</span>
           </div>
           <CodeEditor code={code} onChange={setCode} />
           <div className="editor-footer">
-            <div className="editor-status">
-              <span className="status-dot" />
-              {loading ? "Running tests..." : submitCount > 0 ? `${submitCount} submission${submitCount > 1 ? "s" : ""}` : "Ready"}
-            </div>
             <button className="submit-btn" onClick={handleSubmit} disabled={loading}>
               {loading ? (
-                <><span className="spinner" /> Evaluating...</>
+                <><span className="spinner" /> Running...</>
               ) : (
-                <><span>▶</span> Run & Submit</>
+                <><span>▶</span> Submit Code</>
               )}
             </button>
           </div>
