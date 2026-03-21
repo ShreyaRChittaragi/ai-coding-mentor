@@ -1,35 +1,31 @@
+from app.services.cognitive_analyzer import analyze_patterns
+
 def detect_patterns(session: dict) -> dict:
     """
-    Takes raw behavioral signals from a session
-    and converts them into cognitive pattern labels.
+    Wrapper that delegates to cognitive_analyzer.
+    Keeps memory route working while using one consistent
+    pattern detection logic across the whole project.
     """
-    patterns = []
+    # Map memory route field names → signal tracker field names
+    signals = {
+        "user_id": session.get("user_id", "unknown"),
+        "problem_id": session.get("problem_id", "unknown"),
+        "attempt_number": session.get("attempts", 1),
+        "time_taken_sec": session.get("time_taken_seconds", 0),
+        "code_edit_count": session.get("code_edit_count", 0),
+        "all_passed": session.get("solved", False),
+        "passed_count": session.get("passed_count", 0),
+        "total_cases": session.get("total", 1),
+        "execution_time_ms": session.get("execution_time_ms", 0),
+        "error_types": session.get("error_types", []),
+        "failed_cases": session.get("failed_cases", [])
+    }
 
-    time_taken = session.get("time_taken_seconds", 0)
-    attempts = session.get("attempts", 1)
-    errors = session.get("error_types", [])
-
-    # Overthinking — too much time, few attempts
-    if time_taken > 600 and attempts <= 2:
-        patterns.append("overthinking")
-
-    # Guessing — many attempts, short time
-    if attempts >= 5 and time_taken < 120:
-        patterns.append("guessing")
-
-    # Syntax struggles
-    if errors.count("SyntaxError") >= 2:
-        patterns.append("syntax_struggles")
-
-    # Logic errors
-    if errors.count("LogicError") >= 2:
-        patterns.append("logic_gaps")
-
-    # Gives up early
-    if attempts == 1 and not session.get("solved", False):
-        patterns.append("gives_up_early")
+    result = analyze_patterns(signals)
 
     return {
-        "patterns": patterns,
-        "summary": f"Detected {len(patterns)} pattern(s): {', '.join(patterns) if patterns else 'none'}"
+        "patterns": result["patterns"],
+        "summary": f"Detected {len(result['patterns'])} pattern(s): "
+                   f"{result['dominant_pattern']} "
+                   f"(confidence: {result['dominant_confidence']})"
     }
