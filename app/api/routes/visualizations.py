@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from app.memory.hindsight import retrieve_memory 
+from app.memory.hindsight import retrieve_memory
 
 router = APIRouter()
 
@@ -7,38 +7,45 @@ router = APIRouter()
 def get_visualizations(user_id: str):
     memory = retrieve_memory(user_id)
 
-    if not memory or memory["total_sessions"] == 0:
+    patterns = memory.get("patterns", [])
+    total_sessions = memory.get("total_sessions", 0)
+
+    if not patterns or total_sessions == 0:
         return {
             "user_id": user_id,
-            "message": "No sessions yet — showing sample data",
-            "pattern_trends": [
-                {"session": 1, "pattern": "guessing",     "confidence": 0.8},
-                {"session": 2, "pattern": "guessing",     "confidence": 0.7},
-                {"session": 3, "pattern": "overthinking", "confidence": 0.6},
-                {"session": 4, "pattern": "concept_gap",  "confidence": 0.5},
-                {"session": 5, "pattern": "overthinking", "confidence": 0.4}
-            ],
-            "accuracy_improvement": [
-                {"session": 1, "passed": 1, "total": 3},
-                {"session": 2, "passed": 2, "total": 3},
-                {"session": 3, "passed": 2, "total": 3},
-                {"session": 4, "passed": 3, "total": 3},
-                {"session": 5, "passed": 3, "total": 3}
-            ],
-            "mistake_categories": {
-                "edge_case": 3,
-                "logic":     2,
-                "syntax":    1,
-                "timeout":   0
-            },
-            "dominant_pattern": "guessing",
-            "total_sessions": 5
+            "message": "No sessions yet",
+            "pattern_trends": [],
+            "mistake_categories": {},
+            "dominant_pattern": None,
+            "total_sessions": 0
         }
+
+    # Build pattern trends from real data
+    pattern_trends = [
+        {
+            "session": i + 1,
+            "pattern": p["pattern"],
+            "confidence": p["confidence"],
+            "detected_at": p["detected_at"]
+        }
+        for i, p in enumerate(patterns)
+    ]
+
+    # Count mistake categories
+    mistake_categories = {}
+    for p in patterns:
+        mistake = p.get("mistake_type") or p.get("pattern")
+        if mistake:
+            mistake_categories[mistake] = mistake_categories.get(mistake, 0) + 1
+
+    # Find dominant pattern
+    dominant = max(mistake_categories, key=mistake_categories.get) if mistake_categories else None
 
     return {
         "user_id": user_id,
-        "pattern_trends": memory.get("patterns", []),
-        "total_sessions": memory.get("total_sessions", 0),
-        "dominant_pattern": memory.get("dominant_pattern", None),
-        "last_active": memory.get("last_active", None)
+        "total_sessions": total_sessions,
+        "pattern_trends": pattern_trends,
+        "mistake_categories": mistake_categories,
+        "dominant_pattern": dominant,
+        "last_active": memory.get("last_active")
     }
