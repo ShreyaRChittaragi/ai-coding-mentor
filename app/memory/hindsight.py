@@ -18,15 +18,16 @@ def store_session(user_id: str, session_data: dict):
     )
     client.retain(
         bank_id=BANK_ID,
-        text=content,
-        metadata={"user_id": user_id}
+        content=content,
+        metadata={"user_id": user_id},
+        tags=[user_id]
     )
 
 def retrieve_memory(user_id: str) -> dict:
     results = client.recall(
         bank_id=BANK_ID,
         query=f"behavioral patterns of user {user_id}",
-        filters={"user_id": user_id}
+        tags=[user_id]
     )
     return {"user_id": user_id, "memory": results}
 
@@ -34,6 +35,9 @@ def reflect_on_user(user_id: str, question: str) -> str:
     response = client.reflect(
         bank_id=BANK_ID,
         query=question,
-        filters={"user_id": user_id}
+        budget="low",
+        context=f"This question is about user {user_id}",
+        tags=[user_id],
+        include_facts=True
     )
-    return response
+    return response.answer if hasattr(response, "answer") else str(response)
