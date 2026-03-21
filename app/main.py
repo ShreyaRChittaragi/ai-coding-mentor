@@ -1,3 +1,4 @@
+from app.api.routes import visualizations  
 from fastapi import FastAPI
 from dotenv import load_dotenv
 load_dotenv()
@@ -27,3 +28,5 @@ def root():
 @app.get("/health")
 def health():
     return {"status": "healthy"}
+       
+app.include_router(visualizations.router)      

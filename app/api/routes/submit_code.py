@@ -33,7 +33,7 @@ def submit_code(submission: CodeSubmission):
     # Step 4: Analyze into cognitive patterns
     patterns = analyze_patterns(signals)
 
-    # Step 5: Store into memory (THIS was the missing wire)
+    # Step 5: Store into memory
     store_session(
         user_id=submission.user_id,
         session_data={
