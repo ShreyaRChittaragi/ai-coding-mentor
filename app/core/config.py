@@ -1,4 +1,5 @@
 from pydantic_settings import BaseSettings
+from pydantic import ConfigDict
 
 class Settings(BaseSettings):
     APP_NAME: str = "AI Coding Mentor"
@@ -8,10 +9,8 @@ class Settings(BaseSettings):
     HINDSIGHT_URL: str = "https://api.hindsight.vectorize.io"
     HINDSIGHT_LLM_PROVIDER: str = "groq"
     HINDSIGHT_LLM_MODEL: str = "openai/gpt-oss-20b"
-    HINDSIGHT_BASE_URL: str = "http://localhost:8888"  # ← add this
+    HINDSIGHT_BASE_URL: str = "http://localhost:8888"
 
-    class Config:
-        env_file = ".env"
-        extra = "ignore"   # ← also add this so unknown .env vars never crash the app again
+    model_config = ConfigDict(env_file=".env", extra="ignore")
 
 settings = Settings()
