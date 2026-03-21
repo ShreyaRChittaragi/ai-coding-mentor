@@ -1,4 +1,5 @@
 from fastapi import APIRouter, HTTPException
+from app.services.problem_generator import generate_problem
 from app.services.problem_store import (
     get_problem_by_id,
     get_all_problems,
@@ -43,3 +44,14 @@ def get_problem(problem_id: str):
             detail=f"Problem '{problem_id}' not found"
         )
     return problem
+
+@router.get("/problems/generate/{topic}/{difficulty}")
+def generate_new_problem(topic: str, difficulty: str):
+    try:
+        problem = generate_problem(topic, difficulty)
+        return problem
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, 
+            detail=f"Generation failed: {str(e)}"
+        )
