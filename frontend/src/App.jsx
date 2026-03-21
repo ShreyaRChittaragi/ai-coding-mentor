@@ -49,7 +49,11 @@ export default function App() {
           <ProblemPanel
             problemId={problemId}
             apiBase={API_BASE}
-            onProblemChange={setProblemId}
+            userId={USER_ID}
+            onProblemChange={(id, starterCode) => {
+              setProblemId(id);
+              if (starterCode) setCode(starterCode);
+            }}
           />
           <InsightsPanel userId={USER_ID} apiBase={API_BASE} feedback={feedback} />
         </aside>
