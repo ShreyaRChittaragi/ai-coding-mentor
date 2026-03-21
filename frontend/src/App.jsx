@@ -3,6 +3,7 @@ import ProblemPanel from "./components/ProblemPanel";
 import CodeEditor from "./components/CodeEditor";
 import FeedbackPanel from "./components/FeedbackPanel";
 import InsightsPanel from "./components/InsightsPanel";
+import PatternChart from "./components/PatternChart";
 import "./App.css";
 
 const USER_ID = "test_user";
@@ -64,6 +65,7 @@ export default function App() {
             }}
           />
           <InsightsPanel userId={USER_ID} apiBase={API_BASE} feedback={feedback} />
+          <PatternChart userId={USER_ID} apiBase={API_BASE} />
         </aside>
 
         <section className="center-panel">
