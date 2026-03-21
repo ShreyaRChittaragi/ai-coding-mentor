@@ -1,11 +1,33 @@
 from app.memory.schemas import UserMemoryProfile, PatternRecord
 from datetime import datetime
+import json
+import os
 
-# In-memory store — replace with real Hindsight API later
+MEMORY_FILE = "memory_data.json"
+
+# ✅ Define store FIRST
 _memory_store: dict[str, UserMemoryProfile] = {}
 
+def _save_to_disk():
+    data = {uid: profile.model_dump() for uid, profile in _memory_store.items()}
+    with open(MEMORY_FILE, "w") as f:
+        json.dump(data, f, default=str)
+
+def _load_from_disk():
+    if not os.path.exists(MEMORY_FILE):
+        return
+    with open(MEMORY_FILE, "r") as f:
+        data = json.load(f)
+    for uid, profile_data in data.items():
+        try:
+            _memory_store[uid] = UserMemoryProfile(**profile_data)
+        except Exception:
+            pass  # skip corrupted entries, don't crash startup
+
+# ✅ Load AFTER store is defined and functions exist
+_load_from_disk()
+
 def store_session(user_id: str, session_data: dict):
-    """Store a session and its detected patterns into user memory."""
     if user_id not in _memory_store:
         _memory_store[user_id] = UserMemoryProfile(user_id=user_id)
 
@@ -27,8 +49,9 @@ def store_session(user_id: str, session_data: dict):
                 mistake_type=None
             ))
 
+    _save_to_disk()  # ✅ persist after every store
+
 def retrieve_memory(user_id: str) -> dict:
-    """Get the full memory profile for a user."""
     profile = _memory_store.get(user_id)
     if not profile:
         return {
@@ -41,23 +64,19 @@ def retrieve_memory(user_id: str) -> dict:
     return profile.model_dump()
 
 def update_memory(user_id: str, new_pattern: PatternRecord):
-    """Add a single new pattern to an existing user profile."""
     if user_id not in _memory_store:
         _memory_store[user_id] = UserMemoryProfile(user_id=user_id)
     _memory_store[user_id].patterns.append(new_pattern)
+    _save_to_disk()  # ✅ persist this too
 
 def reflect_on_user(user_id: str, question: str) -> str:
-    """
-    Summarize what we know about a user's patterns.
-    Mock version — replace with real Hindsight reflect() call later.
-    """
     profile = _memory_store.get(user_id)
     if not profile or not profile.patterns:
         return "No behavioral history found for this user yet."
 
     pattern_summary = ", ".join(
         f"{p.pattern} (confidence: {p.confidence})"
-        for p in profile.patterns[-5:]  # last 5 patterns only
+        for p in profile.patterns[-5:]
     )
 
     return (
