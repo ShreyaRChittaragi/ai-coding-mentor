@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 
-export default function ProblemPanel({ problemId, apiBase, onProblemChange }) {
+export default function ProblemPanel({ problemId, apiBase, onProblemChange, userId }) {
   const [problem, setProblem] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [nextLoading, setNextLoading] = useState(false);
   const [error, setError] = useState(null);
   const [inputId, setInputId] = useState(problemId);
 
@@ -14,12 +15,29 @@ export default function ProblemPanel({ problemId, apiBase, onProblemChange }) {
       if (!res.ok) throw new Error("Problem not found");
       const data = await res.json();
       setProblem(data);
-      onProblemChange(id);
+      setInputId(id);
+      onProblemChange(id, data.starter_code);
     } catch (err) {
       setError(err.message);
       setProblem(null);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadNextProblem = async () => {
+    setNextLoading(true);
+    setError(null);
+    try {
+      const res = await fetch(`${apiBase}/next_problem/${userId}`);
+      if (!res.ok) throw new Error("Could not fetch next problem");
+      const data = await res.json();
+      const nextId = data.problem_id || data.id || data;
+      await loadProblem(nextId);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setNextLoading(false);
     }
   };
 
@@ -60,6 +78,19 @@ export default function ProblemPanel({ problemId, apiBase, onProblemChange }) {
           <div className="problem-description">{problem.description}</div>
         </>
       )}
+
+      <button
+        className="next-btn"
+        onClick={loadNextProblem}
+        disabled={nextLoading}
+        style={{ marginTop: "16px" }}
+      >
+        {nextLoading ? (
+          <><span className="spinner" style={{ borderColor: "#0d0f14", borderTopColor: "transparent" }} /> Finding...</>
+        ) : (
+          <>⚡ Next Problem</>
+        )}
+      </button>
     </div>
   );
 }
