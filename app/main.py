@@ -3,6 +3,7 @@ from fastapi import FastAPI
 from dotenv import load_dotenv
 load_dotenv()
 
+from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.api.routes import memory
 from app.api.routes import submit_code, get_problem, get_feedback, user_profile
@@ -12,6 +13,13 @@ app = FastAPI(
     title=settings.APP_NAME,
     description="AI-powered coding practice mentor with behavioral memory",
     version="0.1.0"
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 app.include_router(memory.router)
