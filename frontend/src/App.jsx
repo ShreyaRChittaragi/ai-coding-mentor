@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import ProblemPanel from "./components/ProblemPanel";
 import CodeEditor from "./components/CodeEditor";
 import FeedbackPanel from "./components/FeedbackPanel";
 import InsightsPanel from "./components/InsightsPanel";
 import PatternChart from "./components/PatternChart";
+import FilterBar from "./components/FilterBar";
 import "./App.css";
 
 const USER_ID = "test_user";
@@ -14,26 +15,86 @@ export default function App() {
   const [code, setCode] = useState("def two_sum(nums, target):\n    pass");
   const [feedback, setFeedback] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [hintLoading, setHintLoading] = useState(false);
   const [error, setError] = useState(null);
   const [submitCount, setSubmitCount] = useState(0);
+  const [attemptNumber, setAttemptNumber] = useState(1);
+  const [editCount, setEditCount] = useState(0);
+  const [problemStartTime, setProblemStartTime] = useState(Date.now());
+
+  const handleProblemChange = (id, starterCode) => {
+    setProblemId(id);
+    if (starterCode) setCode(starterCode);
+    setFeedback(null);
+    setAttemptNumber(1);
+    setEditCount(0);
+    setProblemStartTime(Date.now());
+  };
+
+  const handleCodeChange = (val) => {
+    setCode(val);
+    setEditCount(c => c + 1);
+  };
 
   const handleSubmit = async () => {
     setLoading(true);
     setError(null);
     setFeedback(null);
+    const timeTaken = Math.round((Date.now() - problemStartTime) / 1000);
     try {
+      // Submit code for eval
+      const submitRes = await fetch(`${API_BASE}/submit_code`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          user_id: USER_ID,
+          problem_id: problemId,
+          code,
+          language: "python",
+          time_taken: timeTaken,
+          attempt_number: attemptNumber,
+          code_edit_count: editCount,
+        }),
+      });
+      const submitData = submitRes.ok ? await submitRes.json() : null;
+
+      // Get feedback
       const params = new URLSearchParams({ user_id: USER_ID, problem_id: problemId, code });
-      const res = await fetch(`${API_BASE}/get_feedback?${params}`, { method: "POST" });
-      if (!res.ok) throw new Error(`Server error: ${res.status}`);
-      const data = await res.json();
-      setFeedback(data);
+      const feedbackRes = await fetch(`${API_BASE}/get_feedback?${params}`, { method: "POST" });
+      if (!feedbackRes.ok) throw new Error(`Server error: ${feedbackRes.status}`);
+      const feedbackData = await feedbackRes.json();
+
+      // Merge eval_result from submit if feedback doesn't have it
+      if (!feedbackData.eval_result && submitData?.eval_result) {
+        feedbackData.eval_result = submitData.eval_result;
+      }
+
+      setFeedback(feedbackData);
       setSubmitCount(c => c + 1);
+      setAttemptNumber(a => a + 1);
     } catch (err) {
       setError(err.message);
     } finally {
       setLoading(false);
     }
   };
+
+  const handleGetHint = async () => {
+    setHintLoading(true);
+    try {
+      const params = new URLSearchParams({ user_id: USER_ID, problem_id: problemId, code });
+      const res = await fetch(`${API_BASE}/get_feedback?${params}`, { method: "POST" });
+      if (!res.ok) throw new Error(`Server error: ${res.status}`);
+      const data = await res.json();
+      setFeedback(data);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setHintLoading(false);
+    }
+  };
+
+  const timeSinceStart = Math.round((Date.now() - problemStartTime) / 1000);
 
   return (
     <div className="app">
@@ -48,6 +109,7 @@ export default function App() {
               {submitCount} submit{submitCount !== 1 ? "s" : ""}
             </span>
           )}
+          <span className="attempt-badge">attempt #{attemptNumber}</span>
           <span className="user-badge">👤 {USER_ID}</span>
         </div>
       </header>
@@ -58,25 +120,23 @@ export default function App() {
             problemId={problemId}
             apiBase={API_BASE}
             userId={USER_ID}
-            onProblemChange={(id, starterCode) => {
-              setProblemId(id);
-              if (starterCode) setCode(starterCode);
-              setFeedback(null);
-            }}
+            onProblemChange={handleProblemChange}
           />
           <InsightsPanel userId={USER_ID} apiBase={API_BASE} feedback={feedback} />
           <PatternChart userId={USER_ID} apiBase={API_BASE} />
         </aside>
 
         <section className="center-panel">
+          <FilterBar apiBase={API_BASE} onProblemChange={handleProblemChange} />
           <div className="editor-header">
             <span className="editor-label">EDITOR</span>
             <div className="editor-header-right">
+              <span className="edit-chip">✏ {editCount} edits</span>
               <span className="problem-id-chip">{problemId}</span>
               <span className="lang-badge">Python</span>
             </div>
           </div>
-          <CodeEditor code={code} onChange={setCode} />
+          <CodeEditor code={code} onChange={handleCodeChange} />
           <div className="editor-footer">
             <div className="footer-left">
               {feedback?.eval_result && (
@@ -85,18 +145,23 @@ export default function App() {
                 </span>
               )}
             </div>
-            <button className="submit-btn" onClick={handleSubmit} disabled={loading}>
-              {loading ? (
-                <><span className="spinner" /> Running...</>
-              ) : (
-                <><span>▶</span> Submit Code</>
-              )}
-            </button>
+            <div className="footer-right">
+              <button className="hint-btn" onClick={handleGetHint} disabled={hintLoading || loading}>
+                {hintLoading ? <><span className="spinner" style={{ borderColor: "#fff", borderTopColor: "transparent" }} /> Thinking...</> : "💡 Get Hint"}
+              </button>
+              <button className="submit-btn" onClick={handleSubmit} disabled={loading || hintLoading}>
+                {loading ? (
+                  <><span className="spinner" /> Running...</>
+                ) : (
+                  <><span>▶</span> Submit Code</>
+                )}
+              </button>
+            </div>
           </div>
         </section>
 
         <aside className="right-panel">
-          <FeedbackPanel feedback={feedback} error={error} loading={loading} />
+          <FeedbackPanel feedback={feedback} error={error} loading={loading || hintLoading} />
         </aside>
       </main>
     </div>

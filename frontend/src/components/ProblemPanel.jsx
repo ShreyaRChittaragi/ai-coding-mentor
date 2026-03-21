@@ -44,7 +44,7 @@ export default function ProblemPanel({ problemId, apiBase, onProblemChange, user
     }
   };
 
-  useEffect(() => { loadProblem(problemId); }, []);
+  useEffect(() => { loadProblem(problemId); }, [problemId]);
 
   const difficultyClass = problem?.difficulty
     ? `difficulty-${problem.difficulty.toLowerCase()}`
@@ -84,6 +84,24 @@ export default function ProblemPanel({ problemId, apiBase, onProblemChange, user
             )}
           </div>
           <div className="problem-description">{problem.description}</div>
+
+          {problem.examples?.length > 0 && (
+            <div className="examples-section">
+              <div className="section-label">Examples</div>
+              {problem.examples.map((ex, i) => (
+                <div key={i} className="example-block">
+                  <div className="example-row">
+                    <span className="example-key">Input:</span>
+                    <span className="example-val">{ex.input}</span>
+                  </div>
+                  <div className="example-row">
+                    <span className="example-key">Output:</span>
+                    <span className="example-val">{ex.output}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </>
       )}
 
