@@ -8,16 +8,7 @@ from app.services.problem_store import (
 
 router = APIRouter()
 
-@router.get("/get_problem/{problem_id}")
-def get_problem(problem_id: str):
-    problem = get_problem_by_id(problem_id)
-    if not problem:
-        raise HTTPException(
-            status_code=404,
-            detail=f"Problem '{problem_id}' not found"
-        )
-    return problem
-
+# STATIC routes first — always before dynamic {problem_id}
 @router.get("/problems")
 def list_problems():
     return get_all_problems()
@@ -41,3 +32,14 @@ def problems_by_topic(topic: str):
             detail=f"No problems found for topic '{topic}'"
         )
     return problems
+
+# DYNAMIC route last — otherwise it swallows everything above
+@router.get("/get_problem/{problem_id}")
+def get_problem(problem_id: str):
+    problem = get_problem_by_id(problem_id)
+    if not problem:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Problem '{problem_id}' not found"
+        )
+    return problem
