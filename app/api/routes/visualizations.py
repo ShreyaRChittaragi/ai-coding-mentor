@@ -1,11 +1,11 @@
 from fastapi import APIRouter
-from app.memory.hindsight import recall_user
+from app.memory.hindsight import retrieve_memory 
 
 router = APIRouter()
 
 @router.get("/visualizations/{user_id}")
 def get_visualizations(user_id: str):
-    memory = recall_user(user_id)
+    memory = retrieve_memory(user_id)
 
     if not memory or memory["total_sessions"] == 0:
         return {
