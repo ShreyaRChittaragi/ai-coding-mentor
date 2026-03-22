@@ -1,10 +1,10 @@
-export default function FeedbackPanel({ feedback, error, loading }) {
+export default function FeedbackPanel({ feedback, error, loading, mode }) {
   if (loading) {
     return (
       <div className="panel-section" style={{ flex: 1 }}>
         <div className="panel-label">
           <span className="panel-label-dot" />
-          Feedback
+          {mode === "hint" ? "Getting hint..." : "Feedback"}
         </div>
         <div className="feedback-loading">
           <span className="spinner" style={{
@@ -12,7 +12,7 @@ export default function FeedbackPanel({ feedback, error, loading }) {
             borderColor: "rgba(0,217,163,0.2)",
             borderTopColor: "var(--accent)"
           }} />
-          Evaluating your code...
+          {mode === "hint" ? "Thinking..." : "Evaluating your code..."}
         </div>
       </div>
     );
@@ -56,39 +56,41 @@ export default function FeedbackPanel({ feedback, error, loading }) {
     <div className="panel-section" style={{ flex: 1, overflowY: "auto" }}>
       <div className="panel-label">
         <span className="panel-label-dot" style={{
-          background: passed ? "var(--success)" : "var(--error)",
-          boxShadow: passed ? "0 0 6px var(--success)" : "0 0 6px var(--error)"
+          background: mode === "hint" ? "var(--accent2)" : passed ? "var(--success)" : "var(--error)",
+          boxShadow: mode === "hint" ? "0 0 6px var(--accent2)" : passed ? "0 0 6px var(--success)" : "0 0 6px var(--error)"
         }} />
-        Feedback
+        {mode === "hint" ? "💡 Hint" : "Feedback"}
       </div>
 
-      <div className={`result-banner ${passed ? "result-pass" : "result-fail"}`}>
-        <span className="result-icon">{passed ? "✓" : "✗"}</span>
-        {passed ? "All Tests Passed" : "Tests Failed"}
-      </div>
+      {mode !== "hint" && (
+        <>
+          <div className={`result-banner ${passed ? "result-pass" : "result-fail"}`}>
+            <span className="result-icon">{passed ? "✓" : "✗"}</span>
+            {passed ? "All Tests Passed" : "Tests Failed"}
+          </div>
 
-      <div className="test-stats">
-        <span className="stat-chip">
-          {passed ? "✓" : "✗"} {passedCount}/{total} passed
-        </span>
-        {execTime !== undefined && (
-          <span className="stat-chip">⏱ {execTime}ms</span>
-        )}
-        {errorTypes.map((e, i) => (
-          <span key={i} className="stat-chip stat-chip-error">{e}</span>
-        ))}
-      </div>
+          <div className="test-stats">
+            <span className="stat-chip">
+              {passed ? "✓" : "✗"} {passedCount}/{total} passed
+            </span>
+            {execTime !== undefined && (
+              <span className="stat-chip">⏱ {execTime}ms</span>
+            )}
+            {errorTypes.map((e, i) => (
+              <span key={i} className="stat-chip stat-chip-error">{e}</span>
+            ))}
+          </div>
+        </>
+      )}
 
       {feedback.feedback && (
         <div className="hint-box">
-          <div className="hint-label">
-            ✦ Mentor Hint
-          </div>
+          <div className="hint-label">✦ Mentor Hint</div>
           <div className="hint-text">{feedback.feedback}</div>
         </div>
       )}
 
-      {edgeCases.length > 0 && (
+      {edgeCases.length > 0 && mode !== "hint" && (
         <>
           <div className="section-label">Test Cases</div>
           {edgeCases.map((tc) => (

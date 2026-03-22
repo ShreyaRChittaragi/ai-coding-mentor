@@ -14,6 +14,7 @@ export default function App() {
   const [problemId, setProblemId] = useState("p001");
   const [code, setCode] = useState("def two_sum(nums, target):\n    pass");
   const [feedback, setFeedback] = useState(null);
+  const [feedbackMode, setFeedbackMode] = useState(null);
   const [loading, setLoading] = useState(false);
   const [hintLoading, setHintLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -26,6 +27,7 @@ export default function App() {
     setProblemId(id);
     if (starterCode) setCode(starterCode);
     setFeedback(null);
+    setFeedbackMode(null);
     setAttemptNumber(1);
     setEditCount(0);
     setProblemStartTime(Date.now());
@@ -42,7 +44,6 @@ export default function App() {
     setFeedback(null);
     const timeTaken = Math.round((Date.now() - problemStartTime) / 1000);
     try {
-      // Submit code for eval
       const submitRes = await fetch(`${API_BASE}/submit_code`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -58,18 +59,17 @@ export default function App() {
       });
       const submitData = submitRes.ok ? await submitRes.json() : null;
 
-      // Get feedback
       const params = new URLSearchParams({ user_id: USER_ID, problem_id: problemId, code });
       const feedbackRes = await fetch(`${API_BASE}/get_feedback?${params}`, { method: "POST" });
       if (!feedbackRes.ok) throw new Error(`Server error: ${feedbackRes.status}`);
       const feedbackData = await feedbackRes.json();
 
-      // Merge eval_result from submit if feedback doesn't have it
       if (!feedbackData.eval_result && submitData?.eval_result) {
         feedbackData.eval_result = submitData.eval_result;
       }
 
       setFeedback(feedbackData);
+      setFeedbackMode("submit");
       setSubmitCount(c => c + 1);
       setAttemptNumber(a => a + 1);
     } catch (err) {
@@ -87,14 +87,13 @@ export default function App() {
       if (!res.ok) throw new Error(`Server error: ${res.status}`);
       const data = await res.json();
       setFeedback(data);
+      setFeedbackMode("hint");
     } catch (err) {
       setError(err.message);
     } finally {
       setHintLoading(false);
     }
   };
-
-  const timeSinceStart = Math.round((Date.now() - problemStartTime) / 1000);
 
   return (
     <div className="app">
@@ -139,7 +138,7 @@ export default function App() {
           <CodeEditor code={code} onChange={handleCodeChange} />
           <div className="editor-footer">
             <div className="footer-left">
-              {feedback?.eval_result && (
+              {feedback?.eval_result && feedbackMode === "submit" && (
                 <span className={`footer-status ${feedback.eval_result.all_passed ? "status-pass" : "status-fail"}`}>
                   {feedback.eval_result.all_passed ? "✓" : "✗"} {feedback.eval_result.passed_count}/{feedback.eval_result.total} tests
                 </span>
@@ -161,7 +160,7 @@ export default function App() {
         </section>
 
         <aside className="right-panel">
-          <FeedbackPanel feedback={feedback} error={error} loading={loading || hintLoading} />
+          <FeedbackPanel feedback={feedback} error={error} loading={loading || hintLoading} mode={feedbackMode} />
         </aside>
       </main>
     </div>
