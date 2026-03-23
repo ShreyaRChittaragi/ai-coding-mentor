@@ -6,12 +6,54 @@
     "difficulty": "easy",
     "topic": "arrays",
     "examples": [
-      {"input": "[2,7,11,15], target=9", "output": "[0,1]"}
+      {
+        "input": "[2,7,11,15], target=9",
+        "output": "[0,1]"
+      }
     ],
     "test_cases": [
-      {"input": {"nums": [2, 7, 11, 15], "target": 9},  "expected": [0, 1]},
-      {"input": {"nums": [3, 2, 4],      "target": 6},  "expected": [1, 2]},
-      {"input": {"nums": [3, 3],         "target": 6},  "expected": [0, 1]}
+      {
+        "input": {
+          "nums": [
+            2,
+            7,
+            11,
+            15
+          ],
+          "target": 9
+        },
+        "expected": [
+          0,
+          1
+        ]
+      },
+      {
+        "input": {
+          "nums": [
+            3,
+            2,
+            4
+          ],
+          "target": 6
+        },
+        "expected": [
+          1,
+          2
+        ]
+      },
+      {
+        "input": {
+          "nums": [
+            3,
+            3
+          ],
+          "target": 6
+        },
+        "expected": [
+          0,
+          1
+        ]
+      }
     ],
     "function_name": "two_sum",
     "starter_code": "def two_sum(nums, target):\n    pass"
@@ -23,13 +65,36 @@
     "difficulty": "easy",
     "topic": "strings",
     "examples": [
-      {"input": "\"hello\"", "output": "\"olleh\""}
+      {
+        "input": "\"hello\"",
+        "output": "\"olleh\""
+      }
     ],
     "test_cases": [
-      {"input": {"s": "hello"},   "expected": "olleh"},
-      {"input": {"s": "world"},   "expected": "dlrow"},
-      {"input": {"s": ""},        "expected": ""},
-      {"input": {"s": "a"},       "expected": "a"}
+      {
+        "input": {
+          "s": "hello"
+        },
+        "expected": "olleh"
+      },
+      {
+        "input": {
+          "s": "world"
+        },
+        "expected": "dlrow"
+      },
+      {
+        "input": {
+          "s": ""
+        },
+        "expected": ""
+      },
+      {
+        "input": {
+          "s": "a"
+        },
+        "expected": "a"
+      }
     ],
     "function_name": "reverse_string",
     "starter_code": "def reverse_string(s):\n    pass"
@@ -41,12 +106,54 @@
     "difficulty": "easy",
     "topic": "loops",
     "examples": [
-      {"input": "n=5", "output": "[\"1\",\"2\",\"Fizz\",\"4\",\"Buzz\"]"}
+      {
+        "input": "n=5",
+        "output": "[\"1\",\"2\",\"Fizz\",\"4\",\"Buzz\"]"
+      }
     ],
     "test_cases": [
-      {"input": {"n": 5},  "expected": ["1","2","Fizz","4","Buzz"]},
-      {"input": {"n": 15}, "expected": ["1","2","Fizz","4","Buzz","Fizz","7","8","Fizz","Buzz","11","Fizz","13","14","FizzBuzz"]},
-      {"input": {"n": 1},  "expected": ["1"]}
+      {
+        "input": {
+          "n": 5
+        },
+        "expected": [
+          "1",
+          "2",
+          "Fizz",
+          "4",
+          "Buzz"
+        ]
+      },
+      {
+        "input": {
+          "n": 15
+        },
+        "expected": [
+          "1",
+          "2",
+          "Fizz",
+          "4",
+          "Buzz",
+          "Fizz",
+          "7",
+          "8",
+          "Fizz",
+          "Buzz",
+          "11",
+          "Fizz",
+          "13",
+          "14",
+          "FizzBuzz"
+        ]
+      },
+      {
+        "input": {
+          "n": 1
+        },
+        "expected": [
+          "1"
+        ]
+      }
     ],
     "function_name": "fizz_buzz",
     "starter_code": "def fizz_buzz(n):\n    pass"
@@ -58,13 +165,36 @@
     "difficulty": "medium",
     "topic": "strings",
     "examples": [
-      {"input": "\"racecar\"", "output": "true"}
+      {
+        "input": "\"racecar\"",
+        "output": "true"
+      }
     ],
     "test_cases": [
-      {"input": {"s": "racecar"},    "expected": true},
-      {"input": {"s": "hello"},      "expected": false},
-      {"input": {"s": "A man a plan a canal Panama"}, "expected": true},
-      {"input": {"s": ""},           "expected": true}
+      {
+        "input": {
+          "s": "racecar"
+        },
+        "expected": true
+      },
+      {
+        "input": {
+          "s": "hello"
+        },
+        "expected": false
+      },
+      {
+        "input": {
+          "s": "A man a plan a canal Panama"
+        },
+        "expected": true
+      },
+      {
+        "input": {
+          "s": ""
+        },
+        "expected": true
+      }
     ],
     "function_name": "is_palindrome",
     "starter_code": "def is_palindrome(s):\n    pass"
@@ -76,14 +206,302 @@
     "difficulty": "easy",
     "topic": "arrays",
     "examples": [
-      {"input": "[3,1,4,1,5,9]", "output": "9"}
+      {
+        "input": "[3,1,4,1,5,9]",
+        "output": "9"
+      }
     ],
     "test_cases": [
-      {"input": {"nums": [3,1,4,1,5,9]},  "expected": 9},
-      {"input": {"nums": [-1,-5,-2]},      "expected": -1},
-      {"input": {"nums": [42]},            "expected": 42}
+      {
+        "input": {
+          "nums": [
+            3,
+            1,
+            4,
+            1,
+            5,
+            9
+          ]
+        },
+        "expected": 9
+      },
+      {
+        "input": {
+          "nums": [
+            -1,
+            -5,
+            -2
+          ]
+        },
+        "expected": -1
+      },
+      {
+        "input": {
+          "nums": [
+            42
+          ]
+        },
+        "expected": 42
+      }
     ],
     "function_name": "find_max",
     "starter_code": "def find_max(nums):\n    pass"
+  },
+  {
+    "id": "p006",
+    "title": "Fibonacci Sequence",
+    "description": "Return the nth Fibonacci number. F(0)=0, F(1)=1, F(n)=F(n-1)+F(n-2). Do not use recursion.",
+    "difficulty": "medium",
+    "topic": "dynamic_programming",
+    "examples": [
+      {
+        "input": "n=6",
+        "output": "8"
+      }
+    ],
+    "test_cases": [
+      {
+        "input": {
+          "n": 0
+        },
+        "expected": 0
+      },
+      {
+        "input": {
+          "n": 1
+        },
+        "expected": 1
+      },
+      {
+        "input": {
+          "n": 6
+        },
+        "expected": 8
+      },
+      {
+        "input": {
+          "n": 10
+        },
+        "expected": 55
+      }
+    ],
+    "function_name": "fibonacci",
+    "starter_code": "def fibonacci(n):\n    pass"
+  },
+  {
+    "id": "p007",
+    "title": "Count Vowels",
+    "description": "Given a string, return the count of vowels (a, e, i, o, u). Case insensitive.",
+    "difficulty": "easy",
+    "topic": "strings",
+    "examples": [
+      {
+        "input": "\"hello world\"",
+        "output": "3"
+      }
+    ],
+    "test_cases": [
+      {
+        "input": {
+          "s": "hello world"
+        },
+        "expected": 3
+      },
+      {
+        "input": {
+          "s": "AEIOU"
+        },
+        "expected": 5
+      },
+      {
+        "input": {
+          "s": "rhythm"
+        },
+        "expected": 0
+      },
+      {
+        "input": {
+          "s": ""
+        },
+        "expected": 0
+      },
+      {
+        "input": {
+          "s": "Beautiful"
+        },
+        "expected": 5
+      }
+    ],
+    "function_name": "count_vowels",
+    "starter_code": "def count_vowels(s):\n    pass"
+  },
+  {
+    "id": "p008",
+    "title": "Find Duplicates",
+    "description": "Given a list of integers, return a list of all numbers that appear more than once. Return them in the order they first appeared. No built-in set tricks allowed \u00e2\u20ac\u201d use a loop.",
+    "difficulty": "medium",
+    "topic": "arrays",
+    "examples": [
+      {
+        "input": "[1,2,3,2,4,3]",
+        "output": "[2,3]"
+      }
+    ],
+    "test_cases": [
+      {
+        "input": {
+          "nums": [
+            1,
+            2,
+            3,
+            2,
+            4,
+            3
+          ]
+        },
+        "expected": [
+          2,
+          3
+        ]
+      },
+      {
+        "input": {
+          "nums": [
+            1,
+            2,
+            3
+          ]
+        },
+        "expected": []
+      },
+      {
+        "input": {
+          "nums": [
+            5,
+            5,
+            5
+          ]
+        },
+        "expected": [
+          5
+        ]
+      },
+      {
+        "input": {
+          "nums": [
+            4,
+            3,
+            2,
+            1,
+            4,
+            3,
+            2,
+            1
+          ]
+        },
+        "expected": [
+          4,
+          3,
+          2,
+          1
+        ]
+      }
+    ],
+    "function_name": "find_duplicates",
+    "starter_code": "def find_duplicates(nums):\n    pass"
+  },
+  {
+    "id": "p009",
+    "title": "Balanced Parentheses",
+    "description": "Given a string containing only '(', ')', '{', '}', '[', ']', return True if the brackets are balanced.",
+    "difficulty": "medium",
+    "topic": "stacks",
+    "examples": [
+      {
+        "input": "\"({[]})\"",
+        "output": "true"
+      }
+    ],
+    "test_cases": [
+      {
+        "input": {
+          "s": "()"
+        },
+        "expected": true
+      },
+      {
+        "input": {
+          "s": "({[]})"
+        },
+        "expected": true
+      },
+      {
+        "input": {
+          "s": "(]"
+        },
+        "expected": false
+      },
+      {
+        "input": {
+          "s": "((()"
+        },
+        "expected": false
+      },
+      {
+        "input": {
+          "s": ""
+        },
+        "expected": true
+      }
+    ],
+    "function_name": "is_balanced",
+    "starter_code": "def is_balanced(s):\n    pass"
+  },
+  {
+    "id": "gen_338d65cc",
+    "title": "Recursive Factorial Calculation",
+    "description": "Write a recursive function to calculate the factorial of a given number.",
+    "difficulty": "easy",
+    "topic": "recursion",
+    "examples": [
+      {
+        "input": "5",
+        "output": "120"
+      }
+    ],
+    "test_cases": [
+      {
+        "input": {
+          "n": 1
+        },
+        "expected": 1
+      },
+      {
+        "input": {
+          "n": 2
+        },
+        "expected": 2
+      },
+      {
+        "input": {
+          "n": 3
+        },
+        "expected": 6
+      },
+      {
+        "input": {
+          "n": 4
+        },
+        "expected": 24
+      },
+      {
+        "input": {
+          "n": 5
+        },
+        "expected": 120
+      }
+    ],
+    "function_name": "factorial",
+    "starter_code": "def factorial(n):\n    pass"
   }
 ]
