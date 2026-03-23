@@ -1,7 +1,8 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 load_dotenv()
-from fastapi.middleware.cors import CORSMiddleware
+
 from app.core.config import settings
 from app.api.routes import memory
 from app.api.routes import submit_code, get_problem, get_feedback, user_profile
@@ -16,14 +17,8 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",
-        "http://127.0.0.1:5173",
-        "http://localhost:3000",
-        "https://ai-coding-mentor-dd7ndbh9x-shreyarchittaragis-projects.vercel.app",
-        "https://*.vercel.app",
-    ],
-    allow_credentials=True,
+    allow_origins=["*"],
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
