@@ -283,11 +283,11 @@ tests/test_routes.py::test_visualizations      PASSED
 
 | # | Name | Role | Article |
 |---|---|---|---|
-| 1 | Shreya R Chittaragi | Memory & Adaptation | [Read Article][article1] |
-| 2 | Devika N D | Code Execution & Behavioral Signals | [Read Article][article2] |
-| 3 | Chiranjeevi C | React Frontend | [Read Article][article3] |
-| 4 | Kiran H | QA, Documentation & GitHub | [Read Article][article4] |
-| 5 | Jagadeesh R S | API Layer & Models | [Read Article][article5] |
+| 1 | Shreya R Chittaragi | Memory & Adaptation | [[Read Article][article1](https://dev.to/shreyarchittaragi/what-happened-when-my-coding-agentstarted-remembering-user-mistakes-1345)] |
+| 2 | Devika N D | Code Execution & Behavioral Signals | [[Read Article][article2](https://dev.to/devika2605/how-i-built-the-engine-that-makes-our-ai-mentor-actually-work-5ac6)] |
+| 3 | Chiranjeevi C | React Frontend | [[Read Article][article3](https://dev.to/chiranjeevi_c_f3716deb2c9/what-happened-when-i-wired-a-live-ai-mentor-into-a-react-frontend-5a99)] |
+| 4 | Kiran H | QA, Documentation & GitHub | [[Read Article][article4](https://dev.to/kiranh05/nobody-talks-about-the-person-who-stops-the-team-from-shipping-a-broken-demo-3i38)] |
+| 5 | Jagadeesh R S | API Layer & Models | [[Read Article][article5](https://dev.to/jagadeesh_rs_7cdbf1229db/how-i-built-the-api-layer-that-unblocked-an-entire-team-33cm)] |
 
 [article1]: [post link]
 [article2]: [post link]
