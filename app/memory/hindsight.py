@@ -2,8 +2,6 @@ from hindsight_client import Hindsight
 from app.core.config import settings
 from app.memory.schemas import UserMemoryProfile, PatternRecord
 from datetime import datetime
-import asyncio
-import concurrent.futures
 
 client = Hindsight(
     base_url=settings.HINDSIGHT_URL,
@@ -12,12 +10,6 @@ client = Hindsight(
 
 BANK_ID = "coding-mentor"
 _local_cache: dict[str, UserMemoryProfile] = {}
-
-def _run_async(coro):
-    """Run async coroutine safely from sync context on Render/uvicorn."""
-    with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
-        future = pool.submit(asyncio.run, coro)
-        return future.result(timeout=15)
 
 def store_session(user_id: str, session_data: dict):
     patterns = session_data.get("patterns", [])
@@ -38,16 +30,15 @@ def store_session(user_id: str, session_data: dict):
     )
 
     try:
-        _run_async(client.aretain(
+        client.retain(
             bank_id=BANK_ID,
             content=content,
             context=f"coding session for user {user_id}",
             metadata={"user_id": user_id}
-        ))
+        )
     except Exception as e:
         print(f"[Hindsight] store failed: {e}")
 
-    # Update local cache
     if user_id not in _local_cache:
         _local_cache[user_id] = UserMemoryProfile(user_id=user_id)
 
@@ -74,10 +65,10 @@ def retrieve_memory(user_id: str) -> dict:
         return _local_cache[user_id].model_dump()
 
     try:
-        results = _run_async(client.arecall(
+        results = client.recall(
             bank_id=BANK_ID,
             query=f"behavioral patterns of user {user_id}",
-        ))
+        )
         memories = [r.text for r in results.results] if results.results else []
         return {
             "user_id": user_id,
@@ -103,12 +94,12 @@ def update_memory(user_id: str, new_pattern: PatternRecord):
 
 def reflect_on_user(user_id: str, question: str) -> str:
     try:
-        answer = _run_async(client.areflect(
+        answer = client.reflect(
             bank_id=BANK_ID,
             query=question,
             budget="low",
             context=f"This question is about user {user_id}"
-        ))
+        )
         return answer.text if hasattr(answer, "text") else str(answer)
     except Exception as e:
         print(f"[Hindsight] reflect failed: {e}")
